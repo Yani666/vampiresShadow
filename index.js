@@ -6,6 +6,16 @@ let frames  = 0
 let requestID;
 let points = 0
 
+//audio 
+const audio = new Audio();
+audio.src = "/audio/Lord Mavras.ogg";
+audio.loop = true
+
+const audio2 = new Audio();
+audio2.src = "/audio/game-over.mp3";
+audio2.loop = true
+
+
 //clases, contructor y atributos
 class Vampire {
     constructor(x,y,w,h,imgs){
@@ -55,12 +65,21 @@ class Vampire {
         ctx.drawImage(this.image,this.x,this.y,this.width,this.height)
     }
 
-    collision(enemy){
+    collision(bomb){
         return(
-            this.x < enemy.x + enemy.width &&
-            this.x + this.width > enemy.x  &&
-            this.y < enemy.y + enemy.height &&
-            this.y + this.height > enemy.y
+            this.x < bomb.x + bomb.width &&
+            this.x + this.width > bomb.x  &&
+            this.y < bomb.y + bomb.height &&
+            this.y + this.height > bomb.y
+        ) 
+    }
+
+    collision(bullet){
+        return(
+            this.x < bullet.x + bullet.width &&
+            this.x + this.width > bullet.x  &&
+            this.y < bullet.y + bullet.height &&
+            this.y + this.height > bullet.y
         ) 
     }
 
@@ -74,7 +93,7 @@ class Background{
         this.width = canvas.width;
         this.height = canvas.height;
         this.image = new Image ()
-        this.image.src = "/images/background.jpeg"
+        this.image.src = "./images/background.jpeg";
     }
 
     gameOver(){
@@ -91,14 +110,14 @@ class Background{
     }
 }
 class Bomb{
-    constructor(){
+    constructor(x){
         this.y = 0; 
-        this.x = 206;
+        this.x = Math.floor(Math.random() * (800-106) + 106)
         this.width = 80;
         this.height = 80;
         //imagen
         this.image = new Image();
-        this.image.src = "/images/luz.jpeg" 
+        this.image.src = "./images/luz.jpeg" ;
     }
 
     draw(){
@@ -111,9 +130,9 @@ class Bomb{
 }
 
 class PinkBat{
-    constructor(x,y){
+    constructor(x,imgs){
         this.x = x;
-        this.y = y;
+        this.y = Math.floor(Math.random() * (500-100) + 100)
         this.width = 30
         this.height = 30
         this.image1 = new Image();
@@ -126,28 +145,31 @@ class PinkBat{
     }
 
     draw(){
+
+        this.x --
+        if(frames % 10 == 0 ){
+            this.image = this.image === this.image1 ? this.image2 : this.image1
+        }
+
         
+        
+         
         ctx.drawImage(this.image,this.x,this.y,this.width,this.height)
 
     }
 
-    collision(enemy){
-        return(
-            this.x < enemy.x + enemy.width &&
-            this.x + this.width > enemy.x  &&
-            this.y < enemy.y + enemy.height &&
-            this.y + this.height > enemy.y
-        ) 
-    }
+    
+
+   
 }
 const vampiImgs = [
-    "/images/output-onlinepngtools (2).png",
-    "/images/output-onlinepngtools (3).png"
+    "./images/output-onlinepngtools (2).png",
+    "./images/output-onlinepngtools (3).png"
 ]
 
 const batImgs = [
-    "/images/bat1.png",
-    "/images/bat2.png"
+    "./images/bat1.png",
+    "./images/bat2.png"
 ]
 
 let bombs = []
@@ -156,7 +178,7 @@ let pinks = []
 
 const vampire = new Vampire(2,570,120,120,vampiImgs)//punto de inicio y medidas del personaje
 const back = new Background()
-const pinki = new PinkBat(25,570,30,30,batImgs)
+
 /*update!! es para mover todo lo que queramos y
  verlo reflejado en el ca
  nvas*/
@@ -168,7 +190,7 @@ function update(){
     back.draw()
 
     vampire.draw()
-    pinki.draw()
+    generateBats()
     console.log(vampire)
     generateBombs()
     drawBombs()
@@ -184,45 +206,70 @@ function update(){
 
 function start(){
    requestID =  requestAnimationFrame(update)
+   audio.play()
+   audio2.pause()
 }
 
 function gameOver(){
+    audio.pause()
+    audio2.play()
     back.gameOver()
     requestID = undefined
 }
 //solo nos sirve para instanciar la clase enemi y subirla al arreglo 
 function generateBombs(){
-    const newBombs = getRandomBombs(100,200)
-    if(frames % 100 === 0 || frames % 60 === 0 || frames % 170 ===  0){
-        //esto es  ejemplo para cosas random
-        let widthRan = Math.floor(Math.random() * 300 )
+    
+    if(!(frames % 350 == 0 ))return //condicion para generar vengalas
+    
+        
+        
 
-        let x = Math.floor(Math.random() * (canvas.width -400) + 400 )
-       //
-        const bomb = new Bomb(widthRan, x)
+       
+        const bomb = new Bomb()
         //enemies.push(enemy)
         bombs = [...bombs,bomb]
         /* para hacer un math randon en un rango Math.floor(Math.random()*
         (rangomaximo  - rangominimo)+ rangominimo)*/ 
-    }
+    
 
 
 }
 
-function getRandomBombs(min, max){
-    return Math.floor(Math.random() * (max - min) + min);
-}
 
 
 function  generateBats(){
-    const bullet = new PinkBat(vampire.x+vampire.width,vampire.y)
+
+    if(!(frames % 380 == 0))return //condicion para generar bats
+    const bullet = new PinkBat(canvas.width, batImgs)
+    if(vampire.collision(pinks)){
+        gameOver()
+    }
+    
+    
   
    // if(bullets < 3){
-        console.log("mando bien")
         pinks = [...pinks,bullet]
    // }
 }
 
+
+function drawvamps(){
+    vamp.forEach((vamp,index_vamp)=>{
+        vamp.draw()
+        
+
+pinks.forEach((pink,index_pinks)=> {
+    pink.draw()
+})      
+
+
+if(vampire.collision(bullet)){
+    gameOver()}
+
+   
+
+    })
+}
 
 
 //Dibujamos los enemigos del arreglo!!!
@@ -232,10 +279,12 @@ function drawBombs(){
         bomb.draw()
         
 
-      
+
+pinks.forEach((pink,index_pinks)=> {
+    pink.draw()
+})      
 
     if(vampire.collision(bomb)){
-        console.log("Me esta tocando!!!!!!")
         gameOver()
     }
 
