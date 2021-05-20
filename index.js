@@ -1,6 +1,25 @@
+const front = document.querySelector('.front');
+
+document.addEventListener('DOMContentLoaded', (e)=>{
+    setTimeout(()=>{
+        front.classList.add('display-none');
+    }, 5000)
+} )
+
+
+
 const canvas = document.getElementById("canvas") 
 const ctx = canvas.getContext("2d")
 
+
+canvas.width = 1200;
+canvas.height = 600;
+var background = new Image();
+background.src = "/images/INICIO.jpg";
+
+background.onload = function(){
+    ctx.drawImage(background,0,0);   
+}
 
 let frames  = 0
 let requestID;
@@ -30,7 +49,7 @@ class Vampire {
 
         this.image2 = new Image();
         this.image2.src = imgs[1];
-
+        this.lifes = 3
         this.image = this.image1
     }
  //metodo
@@ -74,15 +93,6 @@ class Vampire {
         ) 
     }
 
-    collision(bullet){
-        return(
-            this.x < bullet.x + bullet.width &&
-            this.x + this.width > bullet.x  &&
-            this.y < bullet.y + bullet.height &&
-            this.y + this.height > bullet.y
-        ) 
-    }
-
 
 }
 
@@ -96,19 +106,85 @@ class Background{
         this.image.src = "./images/background.jpeg";
     }
 
+   
+
     gameOver(){
         
-        ctx.font ="80px Arial " 
+        ctx.font ="80px Creepster " 
         ctx.color="white"
         ctx.fillStyle = "red";
-        ctx.fillText("Te Moriste!!!",250,200)
+        ctx.fillText("you are dead!!!",250,200)
     }
     draw(){
         
         ctx.drawImage(this.image,this.x,this.y,this.width,this.height)
-       
+        
+    }
+
+            
+    
+}
+
+class Face1{
+    constructor(){
+        this.x = 850;
+        this.y = 30;
+        this.width = 60;
+        this.height = 60;
+        this.image = new Image ()
+        this.image.src = "./images/face1.png";
+}
+    draw(){
+        ctx.drawImage(this.image,this.x,this.y,this.width,this.height)
     }
 }
+
+
+class Face2{
+    constructor(){
+        this.x = 920;
+        this.y = 30;
+        this.width = 60;
+        this.height = 60;
+        this.image = new Image ()
+        this.image.src = "/images/face2.png";
+}
+    draw(){
+        ctx.drawImage(this.image,this.x,this.y,this.width,this.height)
+    }
+}
+
+class Face3{
+    constructor(){
+        this.x = 990;
+        this.y = 30;
+        this.width = 60;
+        this.height = 60;
+        this.image = new Image ()
+        this.image.src = "./images/face3.png";
+}
+    draw(){
+        ctx.drawImage(this.image,this.x,this.y,this.width,this.height)
+    }
+}
+
+
+class Baty{
+    constructor(){
+        this.x = 80;
+        this.y = 30;
+        this.width = 50;
+        this.height = 50;
+        this.image = new Image ()
+        this.image.src = "./images/baty.png";
+    }
+    draw(){
+        
+        ctx.drawImage(this.image,this.x,this.y,this.width,this.height)
+        
+    }
+}
+
 class Bomb{
     constructor(x){
         this.y = 0; 
@@ -117,7 +193,7 @@ class Bomb{
         this.height = 80;
         //imagen
         this.image = new Image();
-        this.image.src = "./images/luz.jpeg" ;
+        this.image.src = "/images/cruz.png" ;
     }
 
     draw(){
@@ -147,7 +223,7 @@ class PinkBat{
     draw(){
 
         this.x --
-        if(frames % 10 == 0 ){
+        if(frames % 10 === 0 ){
             this.image = this.image === this.image1 ? this.image2 : this.image1
         }
 
@@ -174,29 +250,45 @@ const batImgs = [
 
 let bombs = []
 let pinks = []
+let faces = []
+
 
 
 const vampire = new Vampire(2,570,120,120,vampiImgs)//punto de inicio y medidas del personaje
 const back = new Background()
+const batBaty = new Baty()
+const face1 = new Face1()
+const face2 = new Face2()
+const face3 = new Face3()
+
 
 /*update!! es para mover todo lo que queramos y
  verlo reflejado en el ca
  nvas*/
+
+
 
 function update(){
     frames ++;
     //limpiar el canvas es muy importante para que no se sobrepongas las anteriores capas
     ctx.clearRect(0,0,canvas.width,canvas.height)
     back.draw()
-
+    //back2.draw()
+    batBaty.draw()
+    face1.draw()
+    face2.draw()
+    face3.draw()
     vampire.draw()
     generateBats()
     console.log(vampire)
     generateBombs()
     drawBombs()
+    drawvamps()
+    ctx.font = "30px Creepster"
+    ctx.fillStyle = "#78288C";
+    ctx.fillText(points,50,60)
 
-    ctx.font = "30px Arial"
-    ctx.fillText(points,350,80)
+    
     if(requestID){
        requestID =  requestAnimationFrame(update)
     }
@@ -240,33 +332,28 @@ function generateBombs(){
 function  generateBats(){
 
     if(!(frames % 380 == 0))return //condicion para generar bats
-    const bullet = new PinkBat(canvas.width, batImgs)
-    if(vampire.collision(pinks)){
-        gameOver()
-    }
+    const arr = new PinkBat(canvas.width, batImgs)
     
-    
-  
-   // if(bullets < 3){
-        pinks = [...pinks,bullet]
-   // }
+        pinks = [...pinks,arr]
+   
 }
 
 
 function drawvamps(){
-    vamp.forEach((vamp,index_vamp)=>{
-        vamp.draw()
+    pinks.forEach((arr,index_arr)=>{
+        arr.draw()
         
-
-pinks.forEach((pink,index_pinks)=> {
-    pink.draw()
-})      
-
-
-if(vampire.collision(bullet)){
-    gameOver()}
-
    
+
+
+if(vampire.collision(arr)){
+    pinks.splice(index_arr,1)
+    points+=1
+}
+
+   if(arr.x+arr.width<=0){
+       pinks.splice(index_arr,1)
+   }
 
     })
 }
@@ -279,18 +366,23 @@ function drawBombs(){
         bomb.draw()
         
 
-
-pinks.forEach((pink,index_pinks)=> {
-    pink.draw()
-})      
-
     if(vampire.collision(bomb)){
-        gameOver()
+        vampire.lifes -=1 
+        bombs.splice(index_bomb,1)
+        if(vampire.lifes<=0){
+
+            gameOver()
+        }
+        
     }
+
+    
 
     })
 }
 //mover vampiro
+
+
 
 
 addEventListener("keydown", (event)=>{
