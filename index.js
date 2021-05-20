@@ -12,14 +12,7 @@ const canvas = document.getElementById("canvas")
 const ctx = canvas.getContext("2d")
 
 
-canvas.width = 1200;
-canvas.height = 600;
-var background = new Image();
-background.src = "/images/INICIO.jpg";
 
-background.onload = function(){
-    ctx.drawImage(background,0,0);   
-}
 
 let frames  = 0
 let requestID;
@@ -51,6 +44,14 @@ class Vampire {
         this.image2.src = imgs[1];
         this.lifes = 3
         this.image = this.image1
+        //caminando atras
+        this.image3 = new Image();
+                this.image3.src = imgs[2];
+                this.image4 = new Image();
+                this.image4.src = imgs[3];
+                
+
+                this.image6 = this.image3
     }
  //metodo
 
@@ -64,8 +65,24 @@ class Vampire {
             }else {
                 this.image = this.image1
             }
-        
         }
+            //caminar atras
+        /*if(this.y <= 130){
+                    if(event.keyCode === 65){
+                if(this.image === this.image3){
+                    this.image = this.image4
+                
+    
+                }else {
+                    this.image = this.image3
+                }
+            }
+            
+            
+        
+        }*/
+        
+        
 
         if(this.y >= 395 && !this.escalera){ //395es nivel de la plataforma
             this.userPull= 395
@@ -75,6 +92,13 @@ class Vampire {
             this.userPull= 247
             this.y =245 
         }  
+
+        if(this.y <= 190 && this.x <= 70 && !this.escalera){ //190 techo sobre escalon eje x
+            this.userPull= 190
+            this.y =192 
+        } 
+        
+
         if(this.y <= 85 && !this.escalera){  //85 es el limite del techo
             this.userPull= 85
             this.y = 87}
@@ -239,8 +263,10 @@ class PinkBat{
    
 }
 const vampiImgs = [
-    "./images/output-onlinepngtools (2).png",
-    "./images/output-onlinepngtools (3).png"
+    "./images/vamp1.png",
+    "./images/vamp2.png",
+    "./images/vamp3.png",
+    "./images/vamp4.png"
 ]
 
 const batImgs = [
@@ -254,7 +280,7 @@ let faces = []
 
 
 
-const vampire = new Vampire(2,570,120,120,vampiImgs)//punto de inicio y medidas del personaje
+const vampire = new Vampire(2,570,80,110,vampiImgs)//punto de inicio y medidas del personaje
 const back = new Background()
 const batBaty = new Baty()
 const face1 = new Face1()
