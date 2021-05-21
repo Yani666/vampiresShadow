@@ -20,15 +20,15 @@ let points = 0
 
 //audio 
 const audio = new Audio();
-audio.src = "/audio/Lord Mavras.ogg";
+audio.src = "./audio/Lord Mavras.ogg";
 audio.loop = true
 
 const audio2 = new Audio();
-audio2.src = "/audio/game-over.mp3";
+audio2.src = "./audio/game-over.mp3";
 audio2.loop = true
 
 const audio3 = new Audio();
-audio3.src = "/audio/win.ogg";
+audio3.src = "./audio/win.ogg";
 audio3.loop = true
 
 
@@ -190,7 +190,7 @@ class Face2{
         this.width = 60;
         this.height = 60;
         this.image = new Image ()
-        this.image.src = "/images/face2.png";
+        this.image.src = "./images/face2.png";
 }
     draw(){
         ctx.drawImage(this.image,this.x,this.y,this.width,this.height)
@@ -236,7 +236,7 @@ class Bomb{
         this.height = 80;
         //imagen
         this.image = new Image();
-        this.image.src = "/images/cruz.png" ;
+        this.image.src = "./images/cruz.png" ;
     }
 
     draw(){
