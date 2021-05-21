@@ -27,6 +27,10 @@ const audio2 = new Audio();
 audio2.src = "/audio/game-over.mp3";
 audio2.loop = true
 
+const audio3 = new Audio();
+audio3.src = "/audio/win.ogg";
+audio3.loop = true
+
 
 //clases, contructor y atributos
 class Vampire {
@@ -97,8 +101,10 @@ class Vampire {
             this.userPull= 190
             this.y =192 
         } 
-        
 
+       
+
+        
         if(this.y <= 85 && !this.escalera){  //85 es el limite del techo
             this.userPull= 85
             this.y = 87}
@@ -137,7 +143,20 @@ class Background{
         ctx.font ="80px Creepster " 
         ctx.color="white"
         ctx.fillStyle = "red";
-        ctx.fillText("you are dead!!!",250,200)
+        ctx.fillText("you are dead!!!",400,200)
+    }
+    draw(){
+        
+        ctx.drawImage(this.image,this.x,this.y,this.width,this.height)
+        
+    }
+
+    winGame(){
+        
+        ctx.font ="80px Creepster " 
+        ctx.color="white"
+        ctx.fillStyle = "red";
+        ctx.fillText("you win!!!",450,200)
     }
     draw(){
         
@@ -221,7 +240,7 @@ class Bomb{
     }
 
     draw(){
-        if(frames % 10 ) this.y += 1;
+        if(frames % 10 ) this.y += 3.5; //3 representa la velocidad en que caen las t
 
 
         ctx.drawImage(this.image,this.x,this.y,this.width,this.height)
@@ -246,7 +265,7 @@ class PinkBat{
 
     draw(){
 
-        this.x --
+        this.x -=3
         if(frames % 10 === 0 ){
             this.image = this.image === this.image1 ? this.image2 : this.image1
         }
@@ -276,7 +295,7 @@ const batImgs = [
 
 let bombs = []
 let pinks = []
-let faces = []
+
 
 
 
@@ -296,14 +315,14 @@ const face3 = new Face3()
 
 function update(){
     frames ++;
+
     //limpiar el canvas es muy importante para que no se sobrepongas las anteriores capas
     ctx.clearRect(0,0,canvas.width,canvas.height)
+    
     back.draw()
     //back2.draw()
     batBaty.draw()
     face1.draw()
-    face2.draw()
-    face3.draw()
     vampire.draw()
     generateBats()
     console.log(vampire)
@@ -314,11 +333,22 @@ function update(){
     ctx.fillStyle = "#78288C";
     ctx.fillText(points,50,60)
 
+    if(vampire.lifes>=3){
+        face3.draw()
+    }
+
+    if(vampire.lifes>=2){
+        face2.draw()
+    }
+
     
     if(requestID){
        requestID =  requestAnimationFrame(update)
     }
     
+    if (!(vampire.x + vampire.width >= 960 && vampire.x + canvas.width)){
+        vampire.escalera = false
+    }
 
 }
 
@@ -326,12 +356,20 @@ function start(){
    requestID =  requestAnimationFrame(update)
    audio.play()
    audio2.pause()
+   audio3.pause()
 }
 
 function gameOver(){
     audio.pause()
     audio2.play()
     back.gameOver()
+    requestID = undefined
+}
+
+function winGame(){
+    audio.pause()
+    audio3.play()
+    back.winGame()
     requestID = undefined
 }
 //solo nos sirve para instanciar la clase enemi y subirla al arreglo 
@@ -375,6 +413,9 @@ function drawvamps(){
 if(vampire.collision(arr)){
     pinks.splice(index_arr,1)
     points+=1
+    if(points>=5){
+        winGame()
+    }
 }
 
    if(arr.x+arr.width<=0){
@@ -419,6 +460,8 @@ addEventListener("keydown", (event)=>{
             vampire.escalera = true;
             vampire.y +=20
         }
+
+       
     }
     //de
     if(event.keyCode === 68){
@@ -432,7 +475,10 @@ addEventListener("keydown", (event)=>{
     }
     //salto
     if(event.keyCode === 87){
-        vampire.y -= 60;
+       
+        if (!(vampire.x + vampire.width >= 960 && vampire.x + canvas.width)){
+            vampire.y -= 60;
+        }
     }
 
     if(event.keyCode === 32){
@@ -442,6 +488,15 @@ addEventListener("keydown", (event)=>{
     if(event.keyCode === 13){
         start()
     }
+
+    if(event.keyCode === 50){
+        winGame()
+        
+    }
     
+    if(event.keyCode === 49){
+        gameOver()
+        
+    }
 
 })
